@@ -1,6 +1,6 @@
-package net.vpc.common.maven.shared;
+package net.thevpc.maven.shared;
 
-import net.vpc.common.maven.util.StringFilter;
+import net.thevpc.maven.util.StringFilter;
 import org.apache.maven.model.Contributor;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Developer;

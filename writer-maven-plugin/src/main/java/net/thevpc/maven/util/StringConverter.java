@@ -3,7 +3,7 @@
  *
  * and open the template in the editor.
  */
-package net.vpc.common.maven.util;
+package net.thevpc.maven.util;
 
 /**
  *

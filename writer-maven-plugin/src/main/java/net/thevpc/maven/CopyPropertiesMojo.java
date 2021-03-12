@@ -21,10 +21,10 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ====================================================================
  */
-package net.vpc.common.maven;
+package net.thevpc.maven;
 
-import net.vpc.common.maven.shared.MavenProperties;
-import net.vpc.common.maven.util.SimpleStringFilter;
+import net.thevpc.maven.shared.MavenProperties;
+import net.thevpc.maven.util.SimpleStringFilter;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.BuildPluginManager;

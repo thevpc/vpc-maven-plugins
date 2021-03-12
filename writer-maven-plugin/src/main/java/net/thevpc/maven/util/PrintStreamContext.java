@@ -1,4 +1,4 @@
-package net.vpc.common.maven.util;
+package net.thevpc.maven.util;
 
 import java.io.PrintStream;
 import java.text.MessageFormat;
@@ -7,8 +7,8 @@ import java.util.List;
 /**
  * Created by vpc on 8/10/16.
  */
-public class Context extends PrintStream{
-    public Context(PrintStream out) {
+public class PrintStreamContext extends PrintStream{
+    public PrintStreamContext(PrintStream out) {
         super(out);
     }
 

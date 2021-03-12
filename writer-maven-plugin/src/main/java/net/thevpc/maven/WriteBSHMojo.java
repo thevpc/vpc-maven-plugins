@@ -1,4 +1,4 @@
-package net.vpc.common.maven;
+package net.thevpc.maven;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -19,8 +19,7 @@ package net.vpc.common.maven;
 import bsh.EvalError;
 import bsh.Interpreter;
 import bsh.TargetError;
-import net.vpc.common.maven.shared.MavenProperties;
-import net.vpc.common.maven.util.*;
+import net.thevpc.maven.shared.MavenProperties;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Contributor;
 import org.apache.maven.model.Dependency;
@@ -36,6 +35,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import net.thevpc.maven.util.PrintStreamContext;
+import net.thevpc.maven.util.LazyOutputStream;
+import net.thevpc.maven.util.OutputStreamFactory;
+import net.thevpc.maven.util.SimpleStringFilter;
+import net.thevpc.maven.util.UserCancelException;
 
 /**
  * Transforms an input file or text snipped using BSH expressions
@@ -63,7 +67,7 @@ public class WriteBSHMojo
     private MavenSession mavenSession;
     @Parameter
     private String text;
-    @Parameter(name = "true")
+    @Parameter(defaultValue = "true")
     private boolean buffered;
 
     @Component
@@ -210,7 +214,7 @@ public class WriteBSHMojo
         } catch (MojoExecutionException e) {
             throw e;
         } catch (Exception e) {
-            throw new MojoExecutionException("Error write-bsh " + outputFile, e);
+            throw new MojoExecutionException("error write-bsh " + outputFile, e);
         } finally {
             if (out != null) {
                 try {
@@ -270,7 +274,7 @@ public class WriteBSHMojo
         this.buffered = buffered;
     }
 
-    public class ContextExt extends Context{
+    public class ContextExt extends PrintStreamContext{
         public ContextExt(PrintStream out) {
             super(out);
         }

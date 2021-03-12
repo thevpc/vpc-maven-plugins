@@ -1,6 +1,5 @@
-package net.vpc.common.maven.util;
+package net.thevpc.maven.util;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 

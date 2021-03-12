@@ -1,4 +1,4 @@
-package net.vpc.common.maven.util;
+package net.thevpc.maven.util;
 
 /**
  * Created by vpc on 8/11/16.

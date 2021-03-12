@@ -1,4 +1,4 @@
-package net.vpc.common.maven;
+package net.thevpc.maven;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -15,9 +15,7 @@ package net.vpc.common.maven;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import net.vpc.common.maven.shared.MavenProperties;
-import net.vpc.common.maven.util.*;
+import net.thevpc.maven.shared.MavenProperties;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Contributor;
 import org.apache.maven.model.Dependency;
@@ -32,11 +30,10 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 /**
- * write a poperties file with pre-formatted property names
- * reflection the project pom.xml
+ * write a properties file with pre-formatted property names reflection the
+ * project pom.xml
  */
 @Mojo(name = "write-properties",
         threadSafe = true,
@@ -45,6 +42,7 @@ import java.util.Properties;
 )
 public class WritePropertiesMojo
         extends AbstractMojo {
+
     /**
      * Location of the file.
      *
@@ -76,8 +74,8 @@ public class WritePropertiesMojo
         PrintStream w = null;
         try {
             w = new PrintStream(f);
-            Context c=new Context(w);
-            printProjectProperties(c,project);
+            net.thevpc.maven.util.PrintStreamContext c = new net.thevpc.maven.util.PrintStreamContext(w);
+            printProjectProperties(c, project);
         } catch (IOException e) {
             throw new MojoExecutionException("Error creating file " + f, e);
         } finally {
@@ -131,45 +129,50 @@ public class WritePropertiesMojo
         this.pluginManager = pluginManager;
     }
 
-    public static void printProjectProperties(Context c,MavenProject project){
-        c.printlnf("project.id=%s", (project.getGroupId()+":"+project.getArtifactId()));
+    public static void printProjectProperties(net.thevpc.maven.util.PrintStreamContext c, MavenProject project) {
+        c.printlnf("project.id=%s", (project.getGroupId() + ":" + project.getArtifactId()));
         c.printlnf("project.version=%s", project.getVersion());
-        c.printlnf("project.name=%s",project.getName());
-        c.printlnfc("project.description=%s",project.getDescription());
-        if(project.getOrganization()!=null){
-            c.printlnfc("project.organization.name=%s",project.getOrganization().getName());
-            c.printlnfc("project.organization.url=%s",project.getOrganization().getUrl());
+        c.printlnf("project.name=%s", project.getName());
+        c.printlnfc("project.description=%s", project.getDescription());
+        if (project.getOrganization() != null) {
+            c.printlnfc("project.organization.name=%s", project.getOrganization().getName());
+            c.printlnfc("project.organization.url=%s", project.getOrganization().getUrl());
         }
-        int index=0;
-        for(Developer dev : project.getDevelopers()){
-            c.printlnfc("project.developers["+index+"].id=%s",dev.getId());
-            c.printlnfc("project.developers["+index+"].name=%s",dev.getName());
-            c.printlnfc("project.developers["+index+"].url=%s",dev.getUrl());
-            c.printlnfc("project.developers["+index+"].organization.name=%s",dev.getOrganization());
-            c.printlnfc("project.developers["+index+"].organization.url=%s",dev.getOrganizationUrl());
-            c.printlnfc("project.developers["+index+"].roles=%s",c.strlist(" ",dev.getRoles()));
+        int index = 0;
+        for (Developer dev : project.getDevelopers()) {
+            c.printlnfc("project.developers[" + index + "].id=%s", dev.getId());
+            c.printlnfc("project.developers[" + index + "].name=%s", dev.getName());
+            c.printlnfc("project.developers[" + index + "].url=%s", dev.getUrl());
+            c.printlnfc("project.developers[" + index + "].organization.name=%s", dev.getOrganization());
+            c.printlnfc("project.developers[" + index + "].organization.url=%s", dev.getOrganizationUrl());
+            c.printlnfc("project.developers[" + index + "].roles=%s", c.strlist(" ", dev.getRoles()));
             index++;
         }
-        index=0;
-        for(Contributor dev : project.getContributors()){
-            c.printlnfc("project.contributors["+index+"].name="+dev.getName());
-            c.printlnfc("project.contributors["+index+"].url="+dev.getUrl());
-            c.printlnfc("project.contributors["+index+"].organization.name="+dev.getOrganization());
-            c.printlnfc("project.contributors["+index+"].organization.url="+dev.getOrganizationUrl());
-            c.printlnfc("project.contributors["+index+"].roles=%s",c.strlist(" ",dev.getRoles()));
+        index = 0;
+        for (Contributor dev : project.getContributors()) {
+            c.printlnfc("project.contributors[" + index + "].name=" + dev.getName());
+            c.printlnfc("project.contributors[" + index + "].url=" + dev.getUrl());
+            c.printlnfc("project.contributors[" + index + "].organization.name=" + dev.getOrganization());
+            c.printlnfc("project.contributors[" + index + "].organization.url=" + dev.getOrganizationUrl());
+            c.printlnfc("project.contributors[" + index + "].roles=%s", c.strlist(" ", dev.getRoles()));
             index++;
         }
-        java.util.Map<String,List<String>> scopes=new HashMap<>();
-        for(Dependency dep : project.getDependencies()){
-            java.util.List<String> deps=(List<String>) scopes.get(dep.getScope());
-            if(deps==null){
-                deps=new java.util.ArrayList<String>();
-                scopes.put(dep.getScope(),deps);
+        java.util.Map<String, List<String>> scopesOptional = new HashMap<>();
+        java.util.Map<String, List<String>> scopesNonOptional = new HashMap<>();
+        for (Dependency dep : project.getDependencies()) {
+            Map<String, List<String>> scopes = dep.isOptional() ? scopesOptional : scopesNonOptional;
+            java.util.List<String> deps = (List<String>) scopes.get(dep.getScope());
+            if (deps == null) {
+                deps = new java.util.ArrayList<String>();
+                scopes.put(dep.getScope(), deps);
             }
-            deps.add(dep.getGroupId()+":"+dep.getArtifactId()+":"+dep.getVersion());
+            deps.add(dep.getGroupId() + ":" + dep.getArtifactId() + ":" + dep.getVersion());
         }
-        for(Map.Entry<String,List<String>> scope : scopes.entrySet()){
-            c.printlnfc("project.dependencies.%s=%s",scope.getKey(),c.strlist(";",scope.getValue()));
+        for (Map.Entry<String, List<String>> scope : scopesOptional.entrySet()) {
+            c.printlnfc("project.dependencies.optional.%s=%s", scope.getKey(), c.strlist(";", scope.getValue()));
+        }
+        for (Map.Entry<String, List<String>> scope : scopesNonOptional.entrySet()) {
+            c.printlnfc("project.dependencies.%s=%s", scope.getKey(), c.strlist(";", scope.getValue()));
         }
     }
 }
