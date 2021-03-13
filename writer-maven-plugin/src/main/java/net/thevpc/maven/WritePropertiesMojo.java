@@ -30,6 +30,7 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.maven.model.Exclusion;
 
 /**
  * write a properties file with pre-formatted property names reflection the
@@ -130,6 +131,7 @@ public class WritePropertiesMojo
     }
 
     public static void printProjectProperties(net.thevpc.maven.util.PrintStreamContext c, MavenProject project) {
+        c.printlnf("writer-maven-plugin.version=%s", "1.1.1");
         c.printlnf("project.id=%s", (project.getGroupId() + ":" + project.getArtifactId()));
         c.printlnf("project.version=%s", project.getVersion());
         c.printlnf("project.name=%s", project.getName());
@@ -157,22 +159,31 @@ public class WritePropertiesMojo
             c.printlnfc("project.contributors[" + index + "].roles=%s", c.strlist(" ", dev.getRoles()));
             index++;
         }
-        java.util.Map<String, List<String>> scopesOptional = new HashMap<>();
-        java.util.Map<String, List<String>> scopesNonOptional = new HashMap<>();
         for (Dependency dep : project.getDependencies()) {
-            Map<String, List<String>> scopes = dep.isOptional() ? scopesOptional : scopesNonOptional;
-            java.util.List<String> deps = (List<String>) scopes.get(dep.getScope());
-            if (deps == null) {
-                deps = new java.util.ArrayList<String>();
-                scopes.put(dep.getScope(), deps);
+            String k = dep.getGroupId() + ":" + dep.getArtifactId();
+            c.printlnfc("project.dependencies.%s.version=%s", k, dep.getVersion());
+            String scope = (dep.getScope() != null && dep.getScope().trim().length() > 0) ? dep.getScope().trim() : "compile";
+            c.printlnfc("project.dependencies.%s.scope=%s", k, scope);
+            if (dep.getOptional() != null && dep.getOptional().trim().length() > 0) {
+                c.printlnfc("project.dependencies.%s.optional=%s", k, dep.getOptional());
             }
-            deps.add(dep.getGroupId() + ":" + dep.getArtifactId() + ":" + dep.getVersion());
-        }
-        for (Map.Entry<String, List<String>> scope : scopesOptional.entrySet()) {
-            c.printlnfc("project.dependencies.optional.%s=%s", scope.getKey(), c.strlist(";", scope.getValue()));
-        }
-        for (Map.Entry<String, List<String>> scope : scopesNonOptional.entrySet()) {
-            c.printlnfc("project.dependencies.%s=%s", scope.getKey(), c.strlist(";", scope.getValue()));
+            if (dep.getClassifier() != null && dep.getClassifier().trim().length() > 0) {
+                c.printlnfc("project.dependencies.%s.classifier=%s", k, dep.getClassifier());
+            }
+            if (dep.getType() != null && dep.getType().trim().length() > 0) {
+                c.printlnfc("project.dependencies.%s.type=%s", k, dep.getType());
+            }
+            if (dep.getManagementKey() != null && dep.getManagementKey().trim().length() > 0) {
+                c.printlnfc("project.dependencies.%s.managementKey=%s", k, dep.getManagementKey());
+            }
+            if (dep.getExclusions() != null & dep.getExclusions().size() > 0) {
+                index = 0;
+                for (Exclusion exclusion : dep.getExclusions()) {
+                    String e = exclusion.getGroupId() + ":" + exclusion.getArtifactId();
+                    c.printlnfc("project.dependencies.%s.exclusions[" + index + "]=%s", k, e);
+                    index++;
+                }
+            }
         }
     }
 }
